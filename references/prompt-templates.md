@@ -1,6 +1,6 @@
 # Prompt Templates
 
-预定义的审计提示模板。
+Predefined audit prompt templates.
 
 ## File ranking
 
