@@ -1,6 +1,6 @@
 # GPT-5.4 Adaptation Notes
 
-Mythos 方法论在 GPT-5.4 上的适配建议。
+该方法论在 GPT-5.4 上的适配建议。
 
 ## 核心适配原则
 
@@ -36,11 +36,11 @@ Mythos 方法论在 GPT-5.4 上的适配建议。
 - concurrency (并发)
 - contract mismatches (契约不匹配)
 
-## 与 Mythos 原版的区别
+## 与原始研究方法的区别
 
-| Mythos 原版 | GPT-5.4 适配 |
-|------------|-------------|
-| 自主漏洞开发 |  grounded bug discovery |
+| 原始研究方法 | GPT-5.4 适配 |
+|-------------|-------------|
+| 自主漏洞开发 | grounded bug discovery |
 | 大规模并行 | 窄审计面，单文件深入 |
 | 复杂利用链 | 回归测试/最小复现 |
 | 报告所有可疑 | 区分 confirmed/weak/rejected |

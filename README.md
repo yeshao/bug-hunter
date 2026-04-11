@@ -2,7 +2,7 @@
 
 A Codex skill for disciplined, evidence-driven bug hunting.
 
-This skill adapts the transferable parts of Anthropic's April 7, 2026 Mythos Preview methodology into a practical workflow for local project audits with `gpt-5.4`:
+This skill adapts the transferable parts of Anthropic's April 7, 2026 cybersecurity research article into a practical workflow for local project audits with `gpt-5.4`:
 
 - rank risky files before deep auditing
 - generate concrete bug hypotheses
@@ -13,7 +13,7 @@ This skill adapts the transferable parts of Anthropic's April 7, 2026 Mythos Pre
 ## Files
 
 - `SKILL.md`: the skill definition and operating workflow
-- `references/mythos-method.md`: source-backed notes on the methodology adaptation
+- `references/methodology.md`: source-backed notes on the methodology adaptation
 
 ## Usage
 
@@ -27,4 +27,4 @@ Typical use cases:
 
 ## Source inspiration
 
-- Anthropic, [Assessing Claude Mythos Preview’s cybersecurity capabilities](https://red.anthropic.com/2026/mythos-preview/)
+- Anthropic, April 7, 2026 cybersecurity capabilities article

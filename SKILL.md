@@ -1,13 +1,13 @@
 ---
 name: bug-hunter
-description: "Mythos-style 漏洞发现工作流，基于 Anthropic 2026 方法论。触发词：bug-hunter, bug hunt, vulnerability audit, 漏洞挖掘, 找bug, 安全审计, bug hunt workflow。NOT: 普通功能开发（用 code-pro）、代码风格审查（用 code-review-v2）、简单问答（直接问）。"
+description: "漏洞发现工作流，基于 Anthropic 2026 方法论。触发词：bug-hunter, bug hunt, vulnerability audit, 漏洞挖掘, 找bug, 安全审计, bug hunt workflow。NOT: 普通功能开发（用 code-pro）、代码风格审查（用 code-review-v2）、简单问答（直接问）。"
 ---
 
-# Mythos-Style Bug Hunt
+# Bug Hunter
 
 **IRON LAW: 无执行证据不报告；未经验证不确认。**
 
-Run a disciplined vulnerability-discovery loop inspired by Anthropic's April 7, 2026 Mythos Preview methodology, adapted for `gpt-5.4` and local project work.
+Run a disciplined vulnerability-discovery loop inspired by Anthropic's April 7, 2026 research article, adapted for `gpt-5.4` and local project work.
 
 Use this skill when the user wants to:
 - find real bugs or vulnerabilities in a codebase
@@ -38,7 +38,7 @@ This follows the transferable part of Anthropic's scaffold:
 - file-prioritized parallelization
 - final validator pass
 
-See [references/mythos-method.md](references/mythos-method.md) for the source-backed mapping.
+See [references/methodology.md](references/methodology.md) for the source-backed mapping.
 
 ## Anti-Patterns (禁止行为)
 
@@ -192,7 +192,7 @@ Validator 回答：
 
 | 文件 | 内容 |
 |------|------|
-| [references/mythos-method.md](references/mythos-method.md) | Mythos 方法论来源与映射 |
+| [references/methodology.md](references/methodology.md) | 方法论来源与映射 |
 | [references/prompt-templates.md](references/prompt-templates.md) | 审计提示模板 |
 | [references/gpt5-adaptation.md](references/gpt5-adaptation.md) | GPT-5.4 适配建议 |
 
