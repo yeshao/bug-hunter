@@ -1,5 +1,5 @@
 ---
-name: mythos-bug-hunt
+name: bug-hunter
 description: "Mythos-style 漏洞发现工作流，基于 Anthropic 2026 方法论。触发词：mythos bug hunt, bug hunt, vulnerability audit, 漏洞挖掘, 找bug, 安全审计, bug hunt workflow。NOT: 普通功能开发（用 code-pro）、代码风格审查（用 code-review-v2）、简单问答（直接问）。"
 ---
 
