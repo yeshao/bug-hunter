@@ -1,10 +1,11 @@
 ---
-name: bug-hunter
-description: Rank risky files, generate concrete bug hypotheses, require executable evidence, and validate only real findings
-license: MIT
+name: mythos-bug-hunt
+description: "Mythos-style 漏洞发现工作流，基于 Anthropic 2026 方法论。触发词：mythos bug hunt, bug hunt, vulnerability audit, 漏洞挖掘, 找bug, 安全审计, bug hunt workflow。NOT: 普通功能开发（用 code-pro）、代码风格审查（用 code-review-v2）、简单问答（直接问）。"
 ---
 
-# Bug Hunter
+# Mythos-Style Bug Hunt
+
+**IRON LAW: 无执行证据不报告；未经验证不确认。**
 
 Run a disciplined vulnerability-discovery loop inspired by Anthropic's April 7, 2026 Mythos Preview methodology, adapted for `gpt-5.4` and local project work.
 
@@ -39,261 +40,167 @@ This follows the transferable part of Anthropic's scaffold:
 
 See [references/mythos-method.md](references/mythos-method.md) for the source-backed mapping.
 
+## Anti-Patterns (禁止行为)
+
+| # | 反模式 | 后果 |
+|---|--------|------|
+| AP-1 | 报告无代码路径的推测性 bug | 浪费验证时间 |
+| AP-2 | 将风格问题标记为安全漏洞 | 噪音 findings |
+| AP-3 | 未经验证就报告为 confirmed | 虚假阳性 |
+| AP-4 | 追求数量而非可复现性 | 报告无价值 |
+| AP-5 | 忽视 validator 的 reject 意见 | 降低可信度 |
+
+## Pre-Delivery Checklist (输出前必检)
+
+- [ ] 已输出风险文件排序列表 (1-5 分)
+- [ ] 每个候选 bug 有具体代码路径
+- [ ] 最强候选已生成可执行复现 (test/fuzz/sanitizer)
+- [ ] 通过 validator 验证 (confirmed/weak/rejected)
+- [ ] 区分三类结果，不混为一谈
+
 ## Workflow
+
+| 阶段 | 入口条件 | 出口条件 |
+|------|---------|---------|
+| 1. Audit Surface | 收到漏洞审计请求 | 明确可执行入口点和信任边界 |
+| 2. File Ranking | Audit Surface 完成 | 输出 1-5 分风险排序 |
+| 3. Per-File Audit | 有风险文件列表 | 生成 3-5 个可验证假设 |
+| 4. Evidence Conversion | 有候选假设 | 生成可执行复现或证伪 |
+| 5. Execution Filter | 有复现/证伪 | 确认 confirmed/weak/rejected |
+| 6. Parallel Audit | 审计面足够大 | 各 lane 完成验证 |
+| 7. Validator Pass | 有疑似 confirmed | validator 给出 verdict |
+| 8. Report | Validator 完成 | 输出结构化报告 |
 
 ### 1. Establish the audit surface
 
-First inspect the repo and answer:
-- What are the executable entrypoints?
-- What parses untrusted input?
-- What crosses trust boundaries?
-- What existing tests or sanitizers can act as an oracle?
+**入口条件：** 收到漏洞审计请求  
+**操作：**
+- 检查可执行入口点
+- 识别解析不可信输入的代码
+- 识别跨越信任边界的位置
+- 检查现有测试或 sanitizer
 
-Prefer narrow high-risk surfaces:
+**高优先级目标：**
 - parsers and decoders
 - CLI argument handling
 - network protocol handlers
 - file format readers
 - auth/session code
 - serialization/deserialization
-- sandbox, subprocess, temp-file, and path handling
+- sandbox, subprocess, temp-file, path handling
+
+**出口条件：** 明确可执行入口点和信任边界
 
 ### 2. Rank files before deep auditing
 
-Create a 1-5 risk ranking for candidate files.
+**入口条件：** Audit Surface 完成  
+**操作：** 使用 [references/prompt-templates.md](references/prompt-templates.md) 中的 File ranking 模板
 
-Use this scale:
-- `1`: constants, docs, trivial wrappers, generated metadata
-- `2`: low-risk glue, display helpers, thin config surfaces
-- `3`: normal business logic with some branching or state
-- `4`: complex stateful logic, error paths, boundary translation
-- `5`: raw input parsing, auth, memory-unsafe paths, protocol handling, privilege boundaries
+风险等级 (1-5):
+- `1`: constants, docs, trivial wrappers
+- `2`: low-risk glue, display helpers
+- `3`: normal business logic
+- `4`: complex stateful logic, error paths
+- `5`: input parsing, auth, memory-unsafe, trust boundaries
 
-For each file, record:
-- score
-- short reason
-- likely bug class
-- best validation route
-
-Start with `5`, then `4`.
+**出口条件：** 输出风险文件排序 (从 5 分开始)
 
 ### 3. Audit one file or subsystem at a time
 
-For each target file, ask for at most 3-5 bug candidates.
+**入口条件：** 有风险文件列表  
+**操作：** 使用 Per-file audit 模板，每文件最多 5 个候选
 
-Require every candidate to include:
-- the invariant that should hold
-- why the code may violate it
-- the exact code path
-- a minimal reproducer idea
-- the fastest validating action
-- confidence: `high`, `medium`, or `low`
+每个候选必须包含：
+- invariant violated
+- exact code path
+- why plausible
+- minimal reproducer idea
+- fastest validation step
+- confidence: high/medium/low
 
-Reject candidates that are only:
-- style complaints
-- hypothetical with no code path
-- untestable without hand-waving
+**出口条件：** 生成 3-5 个可验证假设
 
 ### 4. Convert hypotheses into evidence
 
-For the strongest candidate, immediately move to evidence:
-- write a failing regression test, or
-- create a minimal repro input, or
-- create a fuzz/property harness, or
-- run with sanitizer/debug instrumentation if available
+**入口条件：** 有候选假设  
+**操作：** 使用 Evidence conversion 模板
 
-The model should keep iterating until one of these happens:
-- the bug is reproduced
-- the hypothesis is disproven
-- the path is too weak and should be dropped
+生成：
+- failing regression test, or
+- minimal repro input, or
+- fuzz/property harness, or
+- sanitizer run
 
-Do not count a finding as real without executable evidence.
+**出口条件：** bug reproduced / hypothesis disproven / path dropped
 
 ### 5. Use execution as the filter
 
-Preferred evidence, strongest first:
-1. sanitizer finding or crash with clear stack
+**入口条件：** 有复现/证伪  
+**证据强度排序：**
+1. sanitizer finding / crash with stack
 2. deterministic failing test
-3. differential mismatch across implementations or wrappers
-4. invariant violation shown by program output
-5. precise manual proof when execution is impossible
+3. differential mismatch
+4. invariant violation in output
+5. precise manual proof (if execution impossible)
 
-If execution is available, use it.
-If a test or repro fails to confirm the bug, discard or downgrade the candidate.
+**出口条件：** 确认 confirmed / weak / rejected
 
 ### 6. Run multiple focused audits in parallel
 
-If parallel work is worthwhile, split by disjoint files or subsystems.
+**入口条件：** 审计面足够大  
+**并行 lane：**
+- file ranking
+- parser/input paths
+- wrapper/core contract mismatches
+- candidate validation
 
-Good parallel lanes:
-- one agent ranks files
-- one agent audits parser/input paths
-- one agent audits wrapper/core contract mismatches
-- one agent validates candidate findings
-
-Keep write scopes disjoint if code changes are involved.
+**出口条件：** 各 lane 完成验证
 
 ### 7. Final validator pass
 
-Before reporting a bug as a meaningful finding, run a final validation prompt:
+**入口条件：** 有疑似 confirmed  
+**操作：** 使用 Final validator 模板
 
-`I have received the following bug report. Please confirm whether it is real, reproducible, and interesting. Reject findings that are technically true but low-impact, non-reproducible, or too obscure to matter.`
-
-The validator should answer:
+Validator 回答：
 - Is the finding real?
 - Is the repro credible?
-- What severity or impact is plausible?
-- Is this actually interesting enough to report?
+- What severity?
+- Is this interesting enough?
 - What assumptions remain?
+
+**出口条件：** validator 给出 verdict
 
 ### 8. Report only grounded findings
 
-Final output should separate:
+**入口条件：** Validator 完成  
+**输出结构：**
 - confirmed findings
 - disproven candidates
 - unverified leads
-- remaining high-risk surfaces not yet audited
+- remaining high-risk surfaces
 
-For each confirmed finding include:
+每个 confirmed finding 包含：
 - file and code path
 - impact
 - reproducer or failing test
-- current verification status
+- verification status
 - minimal fix direction
 
-## Prompt Templates
+**出口条件：** 输出结构化报告，通过 Pre-Delivery Checklist
 
-### File ranking
+## References
 
-```text
-Rank the files in this codebase from 1 to 5 by how likely they are to contain an interesting bug or vulnerability.
+| 文件 | 内容 |
+|------|------|
+| [references/mythos-method.md](references/mythos-method.md) | Mythos 方法论来源与映射 |
+| [references/prompt-templates.md](references/prompt-templates.md) | 审计提示模板 |
+| [references/gpt5-adaptation.md](references/gpt5-adaptation.md) | GPT-5.4 适配建议 |
 
-Scoring:
-1 = cannot realistically contain a meaningful bug
-5 = high-risk surface such as input parsing, auth, protocol handling, memory-unsafe logic, or trust-boundary code
+## Best Practices
 
-For each file, return:
-- score
-- one-sentence reason
-- likely bug class
-- best validation route
-```
-
-### Per-file audit
-
-```text
-Audit this file for real bugs, not style issues.
-
-Focus on:
-- incorrect behavior
-- edge cases
-- trust-boundary mistakes
-- parser/state-machine errors
-- cross-layer contract mismatches
-- error-handling failures
-
-Give at most 5 candidates.
-For each candidate include:
-1. invariant violated
-2. exact code path
-3. why the bug seems plausible from the code
-4. minimal reproducer
-5. fastest validation step
-6. confidence: high/medium/low
-
-Omit any candidate you cannot justify from the code.
-```
-
-### Evidence conversion
-
-```text
-Take the highest-confidence candidate and produce the smallest executable artifact that could confirm or refute it.
-
-Prefer:
-- failing test
-- minimal repro input
-- fuzz harness
-- sanitizer-backed run
-
-Do not fix the code yet.
-Do not propose multiple directions.
-Pick the fastest decisive check.
-```
-
-### Final validator
-
-```text
-I have received the following bug report. Please confirm whether it is real, reproducible, and interesting.
-
-Reject findings that are:
-- speculative
-- low-impact edge cases with no realistic trigger
-- unsupported by the repro
-
-Return:
-1. verdict: confirmed / weak / rejected
-2. why
-3. remaining assumptions
-4. likely severity
-5. what evidence would fully close the case
-```
-
-## GPT-5.4 Adaptation Notes
-
-- `gpt-5.4` is strong enough to follow the scaffold, but should be constrained to short candidate lists and fast evidence loops.
-- On small codebases, spend more effort on file ranking and less on massive parallelism.
-- Prefer deterministic tests over long autonomous exploit-development loops.
-- Prefer safe local bug classes first:
-  - parser crashes
-  - path traversal
-  - temp-file races
-  - CLI/wrapper mismatches
-  - Unicode/path normalization bugs
-  - partial-success and error-propagation issues
-
-For memory-unsafe targets:
-- use sanitizers if available
-- use fuzzing or minimized crash repros
-- treat sanitizer hits as the primary oracle
-
-For managed-language repos:
-- focus on trust boundaries, parsing, file handling, state transitions, concurrency, and contract mismatches
-
-## Recommended Operating Rules
-
-- Keep the audit surface narrow.
-- Prefer one subsystem at a time.
-- Cap each audit pass to a small number of candidates.
-- Force every claim toward executable evidence quickly.
-- Do not merge "interesting idea" with "confirmed bug."
-- Separate discovery from validation.
-- If a finding cannot survive the validator pass, do not report it as confirmed.
-
-## Expected Deliverables
-
-For a useful run, produce:
-- a ranked file list
-- a shortlist of bug candidates for top files
-- at least one concrete repro attempt
-- a validator verdict for any claimed finding
-- a residual-risk list for unaudited high-risk files
-
-## When This Skill Works Best
-
-- smaller repos with good tests
-- parser-heavy or CLI-heavy projects
-- projects with clear trust boundaries
-- mixed-language repos where wrappers may drift from core behavior
-
-## When To Reach For More Tooling
-
-Escalate beyond this workflow when:
-- fuzzing harnesses are easy to add and inputs are highly structured
-- sanitizers are available and the target is memory-unsafe
-- the project is large enough to justify many parallel audit lanes
-
-In those cases, pair this workflow with:
-- fuzzing
-- sanitizers
-- differential testing
-- static-analysis facts
+- 保持审计面狭窄
+- 优先单文件深入而非大规模并行
+- 强制每个假设快速走向可执行证据
+- 不将"有趣的想法"与"确认的 bug"混为一谈
+- 发现与验证分离
+- 无法通过 validator 的 finding 不报告为 confirmed
