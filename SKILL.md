@@ -208,7 +208,7 @@ Each confirmed finding should include:
 |------|---------|
 | [references/methodology.md](references/methodology.md) | Source methodology and mapping |
 | [references/prompt-templates.md](references/prompt-templates.md) | Audit prompt templates |
-| [references/gpt5-adaptation.md](references/gpt5-adaptation.md) | Model adaptation guidance |
+| [references/model-adaptation.md](references/model-adaptation.md) | Model adaptation guidance |
 
 ## Best Practices
 

@@ -15,7 +15,7 @@ This skill adapts the transferable parts of Anthropic's April 7, 2026 cybersecur
 - `SKILL.md`: the skill definition and operating workflow
 - `references/methodology.md`: source-backed notes on the methodology adaptation
 - `references/prompt-templates.md`: audit prompt templates
-- `references/gpt5-adaptation.md`: model adaptation guidance
+- `references/model-adaptation.md`: model adaptation guidance
 
 ## Usage
 
