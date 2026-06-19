@@ -23,9 +23,9 @@ Anthropic states this explicitly in the scaffold section of the article.
 - They use a second validation pass to filter low-value or weak reports.
 - They favor bug classes with strong oracles, especially memory-safety issues validated by sanitizers.
 
-## GPT-5.4 adaptation
+## Adaptation for local tooling
 
-The original article focuses heavily on advanced zero-day discovery and, in many cases, memory-safety exploitation. For typical local project work with `gpt-5.4`, the practical adaptation is:
+The original article focuses heavily on advanced zero-day discovery and, in many cases, memory-safety exploitation. For typical local project work with the underlying model, the practical adaptation is:
 
 - keep the scaffold
 - reduce ambition from "autonomous exploit development" to "grounded bug discovery"
@@ -62,7 +62,7 @@ It is:
 - parallelize narrowly
 - validate findings twice
 
-That methodology should transfer reasonably well to smaller codebases and to `gpt-5.4`, especially where the codebase has:
+That methodology should transfer reasonably well to smaller codebases and to the underlying model, especially where the codebase has:
 - structured inputs
 - existing tests
 - deterministic CLI behavior

@@ -2,7 +2,7 @@
 
 A Codex skill for disciplined, evidence-driven bug hunting.
 
-This skill adapts the transferable parts of Anthropic's April 7, 2026 cybersecurity research article into a practical workflow for local project audits with `gpt-5.4`:
+This skill adapts the transferable parts of Anthropic's April 7, 2026 cybersecurity research article into a practical workflow for local project audits with the underlying model:
 
 - rank risky files before deep auditing
 - generate concrete bug hypotheses
@@ -14,6 +14,8 @@ This skill adapts the transferable parts of Anthropic's April 7, 2026 cybersecur
 
 - `SKILL.md`: the skill definition and operating workflow
 - `references/methodology.md`: source-backed notes on the methodology adaptation
+- `references/prompt-templates.md`: audit prompt templates
+- `references/gpt5-adaptation.md`: model adaptation guidance
 
 ## Usage
 

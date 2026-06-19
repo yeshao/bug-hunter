@@ -7,7 +7,7 @@ description: "Bug discovery workflow based on Anthropic's 2026 methodology. Trig
 
 **IRON LAW: Do not report without executable evidence; do not confirm without validation.**
 
-Run a disciplined vulnerability-discovery loop inspired by Anthropic's April 7, 2026 research article, adapted for `gpt-5.4` and local project work.
+Run a disciplined vulnerability-discovery loop inspired by Anthropic's April 7, 2026 research article, adapted for the underlying model and local project work.
 
 Use this skill when the user wants to:
 - find real bugs or vulnerabilities in a codebase
@@ -49,6 +49,7 @@ See [references/methodology.md](references/methodology.md) for the source-backed
 | AP-3 | Marking findings confirmed before validation | Produces false positives |
 | AP-4 | Optimizing for quantity over reproducibility | Lowers report value |
 | AP-5 | Ignoring validator rejection | Reduces credibility |
+| AP-6 | Spending unbounded time on one hypothesis | Starves other candidates |
 
 ## Pre-Delivery Checklist
 
@@ -57,6 +58,7 @@ See [references/methodology.md](references/methodology.md) for the source-backed
 - [ ] The strongest candidate has an executable repro, test, fuzz case, or sanitizer run
 - [ ] A validator pass classified findings as confirmed, weak, or rejected
 - [ ] The report separates confirmed findings, disproven candidates, and unverified leads
+- [ ] If no finding survived evidence, a clean audit report lists files examined and surfaces mapped
 
 ## Workflow
 
@@ -67,7 +69,7 @@ See [references/methodology.md](references/methodology.md) for the source-backed
 | 3. Per-File Audit | Risky files identified | 3-5 testable hypotheses produced |
 | 4. Evidence Conversion | Candidate hypothesis exists | Executable repro or disproof produced |
 | 5. Execution Filter | Repro or disproof exists | Confirmed, weak, or rejected status assigned |
-| 6. Parallel Audit | Audit surface is broad enough | Parallel lanes complete validation |
+| 6. Parallel Audit | Audit surface has ≥3 disjoint trust boundaries | Parallel lanes complete validation |
 | 7. Validator Pass | Candidate looks confirmed | Validator returns a verdict |
 | 8. Report | Validator pass complete | Structured report delivered |
 
@@ -135,6 +137,8 @@ Produce one of:
 - a fuzz or property harness
 - a sanitizer-backed run
 
+Per-candidate cap: if no executable artifact is produced after one full Phase 4 cycle (attempt a fix → run → observe), classify the candidate as `weak` and move to the next candidate. Do not iterate on the same hypothesis indefinitely.
+
 **Exit condition:** the bug is reproduced, disproven, or dropped.
 
 ### 5. Use execution as the filter
@@ -148,17 +152,17 @@ Produce one of:
 4. invariant violation in output
 5. precise manual proof when execution is impossible
 
+**Iteration rule:** if all candidates for a file are rejected, return to Phase 3 for the next highest-ranked file. If all files are exhausted with no confirmed finding, skip Phases 6–7 and proceed directly to the clean-audit report (Phase 8).
+
 **Exit condition:** assign confirmed, weak, or rejected.
 
 ### 6. Run multiple focused audits in parallel
 
-**Entry condition:** the audit surface is broad enough.
+**Entry condition:** the audit surface has ≥3 disjoint trust boundaries whose audits share no context.
 
-**Parallel lanes:**
-- file ranking
-- parser and input paths
-- wrapper and core contract mismatches
-- candidate validation
+**When to skip:** for small codebases or fewer than 3 disjoint trust boundaries, skip this phase entirely and go to Phase 7.
+
+**Parallel lanes:** each lane gets a bounded file list, not a topic. Assign explicit files to each lane.
 
 **Exit condition:** each lane finishes validation.
 
@@ -179,10 +183,10 @@ The validator should answer:
 
 ### 8. Report only grounded findings
 
-**Entry condition:** validator pass is complete.
+**Entry condition:** validator pass is complete — or the iteration rule (Phase 5) produced no confirmed findings.
 
 **Output structure:**
-- confirmed findings
+- confirmed findings (may be zero)
 - disproven candidates
 - unverified leads
 - remaining high-risk surfaces
@@ -194,6 +198,8 @@ Each confirmed finding should include:
 - verification status
 - minimal fix direction
 
+**Clean-audit exit:** if no candidate survived evidence, the report states "no confirmed findings" and includes the audit surface map plus the risk ranking as the deliverable. Do not manufacture findings to fill the report.
+
 **Exit condition:** a structured report passes the Pre-Delivery Checklist.
 
 ## References
@@ -202,7 +208,7 @@ Each confirmed finding should include:
 |------|---------|
 | [references/methodology.md](references/methodology.md) | Source methodology and mapping |
 | [references/prompt-templates.md](references/prompt-templates.md) | Audit prompt templates |
-| [references/gpt5-adaptation.md](references/gpt5-adaptation.md) | GPT-5.4 adaptation guidance |
+| [references/gpt5-adaptation.md](references/gpt5-adaptation.md) | Model adaptation guidance |
 
 ## Best Practices
 

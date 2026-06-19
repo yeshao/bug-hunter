@@ -1,10 +1,10 @@
-# GPT-5.4 Adaptation Notes
+# Model Adaptation Notes
 
-Guidance for adapting this methodology to GPT-5.4.
+Guidance for adapting this methodology to the underlying model.
 
 ## Core adaptation principles
 
-- `gpt-5.4` is strong enough to follow this workflow, but it should be constrained to short candidate lists and fast evidence loops
+- The model is strong enough to follow this workflow, but it should be constrained to short candidate lists and fast evidence loops
 - on small codebases, spend more effort on file ranking and less on large parallel audits
 - prefer deterministic tests over long autonomous exploit-development loops
 - prioritize safe, local bug classes first
@@ -38,8 +38,8 @@ Focus on:
 
 ## Differences from the original research method
 
-| Original research method | GPT-5.4 adaptation |
-|--------------------------|--------------------|
+| Original research method | Adaptation |
+|--------------------------|------------|
 | autonomous exploit development | grounded bug discovery |
 | large-scale parallelism | narrow audit surface with deeper single-file work |
 | complex exploit chains | regression tests and minimal repros |
