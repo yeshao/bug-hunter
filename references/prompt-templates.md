@@ -8,7 +8,10 @@ Predefined audit prompt templates.
 Rank the files in this codebase from 1 to 5 by how likely they are to contain an interesting bug or vulnerability.
 
 Scoring:
-1 = cannot realistically contain a meaningful bug
+1 = cannot realistically contain a meaningful bug (constants, docs, trivial wrappers)
+2 = low-risk glue, display helpers
+3 = normal business logic
+4 = complex stateful logic and error paths
 5 = high-risk surface such as input parsing, auth, protocol handling, memory-unsafe logic, or trust-boundary code
 
 For each file, return:

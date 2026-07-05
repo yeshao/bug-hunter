@@ -1,6 +1,6 @@
 # bug-hunter
 
-A Codex skill for disciplined, evidence-driven bug hunting.
+A skill for disciplined, evidence-driven bug hunting.
 
 This skill adapts the transferable parts of Anthropic's April 7, 2026 cybersecurity research article into a practical workflow for local project audits with the underlying model:
 
@@ -16,10 +16,11 @@ This skill adapts the transferable parts of Anthropic's April 7, 2026 cybersecur
 - `references/methodology.md`: source-backed notes on the methodology adaptation
 - `references/prompt-templates.md`: audit prompt templates
 - `references/model-adaptation.md`: model adaptation guidance
+- `REVIEW.md`: devil's-advocate review with agreed improvements tracked
 
 ## Usage
 
-Place this directory under your Codex skills path as `bug-hunter`, then invoke it when you want a structured bug-finding workflow.
+Place this directory in your agent's skills directory (for example `~/.pi/extensions/bug-hunter`), then invoke it when you want a structured bug-finding workflow.
 
 Typical use cases:
 
@@ -29,4 +30,4 @@ Typical use cases:
 
 ## Source inspiration
 
-- Anthropic, April 7, 2026 cybersecurity capabilities article
+- Anthropic, "Assessing Claude Mythos Preview's cybersecurity capabilities," April 7, 2026 — https://red.anthropic.com/2026/mythos-preview/

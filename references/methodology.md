@@ -71,4 +71,4 @@ That methodology should transfer reasonably well to smaller codebases and to the
 
 ## Source
 
-- Anthropic, April 7, 2026 cybersecurity capabilities article
+- Anthropic, "Assessing Claude Mythos Preview's cybersecurity capabilities," April 7, 2026 — https://red.anthropic.com/2026/mythos-preview/
