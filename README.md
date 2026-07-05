@@ -1,22 +1,26 @@
 # bug-hunter
 
-A skill for disciplined, evidence-driven bug hunting.
+A [Pi](https://github.com/badlogic/pi) agent skill for disciplined, evidence-driven bug hunting.
 
-This skill adapts the transferable parts of Anthropic's April 7, 2026 cybersecurity research article into a practical workflow for local project audits with the underlying model:
+This skill adapts the transferable parts of Anthropic's April 7, 2026 cybersecurity research article into a practical 8-phase workflow for auditing local projects:
 
-- rank risky files before deep auditing
-- generate concrete bug hypotheses
-- convert the best hypothesis into executable evidence
-- reject speculative findings that do not reproduce
-- run a final validator pass before reporting
+1. **Audit Surface** — identify entry points, trust boundaries, and data flows
+2. **File Ranking** — rank files by risk (1–5) before deep auditing
+3. **Per-File Audit** — generate concrete bug hypotheses per risky file
+4. **Per-Candidate Audit** — develop the strongest hypothesis into a testable claim
+5. **Execution** — produce executable evidence (repro, failing test, fuzz harness, sanitizer run)
+6. **Parallel Audit** — (optional) run parallel auditor lanes for large attack surfaces
+7. **Validation** — classify findings as confirmed, weak, or rejected
+8. **Reporting** — deliver findings with evidence, disproven candidates, and unverified leads
+
+**Iron Rule:** Do not report without executable evidence; do not confirm without validation.
 
 ## Files
 
-- `SKILL.md`: the skill definition and operating workflow
-- `references/methodology.md`: source-backed notes on the methodology adaptation
-- `references/prompt-templates.md`: audit prompt templates
-- `references/model-adaptation.md`: model adaptation guidance
-- `REVIEW.md`: devil's-advocate review with agreed improvements tracked
+- `SKILL.md` — skill definition, anti-patterns, pre-delivery checklist, and the 8-phase workflow
+- `references/methodology.md` — source-backed notes on the methodology adaptation
+- `references/prompt-templates.md` — prompt templates for each workflow phase
+- `references/model-adaptation.md` — guidance on adapting the audit to the target language/framework
 
 ## Usage
 
